@@ -6,9 +6,6 @@ __pycache__/
 *.pyd
 *.sqlite3
 
-# Model weights (OPTIONAL — remove if you want to upload weights)
-satellite_classifier.pth
-
 # Node
 node_modules/
 build/
