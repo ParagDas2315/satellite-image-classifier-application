@@ -1,0 +1,21 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Model weights (OPTIONAL — remove if you want to upload weights)
+satellite_classifier.pth
+
+# Node
+node_modules/
+build/
+
+# Env files
+.env
+
+# OS
+.DS_Store
+Thumbs.db
