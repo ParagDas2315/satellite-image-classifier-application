@@ -1,59 +1,123 @@
-# Satellite Image Application
+# Satellite Image Classifier
 
-This repository contains a simple satellite image classification web application with a Python FastAPI backend and a React frontend.
+A full-stack application for identifying terrain types from satellite imagery. This project uses a FastAPI (PyTorch) backend and a React frontend, orchestrated with Docker and Nginx for a seamless, zero-config setup.
 
-Folders
-- `backend/` — FastAPI app, model loading and inference code.
-- `satellite-image-ui/` — React frontend.
+---
 
-Prerequisites
-- Python 3.9+ (or compatible) for the backend.
-- Node.js 14+ / npm for the frontend.
+## Getting Started (Instant Launch)
 
-Backend (local development)
+You do not need to install Python, Node.js, or any dependencies manually. You only need Docker.
 
-1. Create and activate a virtual environment inside the `backend` folder:
+### 1. Prerequisites
 
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-```
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop) (includes Docker Compose)
 
-2. Install Python dependencies (run from repository root or `backend` if you prefer):
+---
+
+### 2. Run the Application
+
+Open your terminal in the project root folder and run:
 
 ```bash
-pip install -r requirements.txt
+docker-compose up --build
 ```
 
-3. Run the backend server (from `backend`):
+---
 
-```bash
-uvicorn app:app --reload
+### 3. Access the Project
+
+| Service | URL |
+|---------|-----|
+| **Web Interface** | [http://localhost](http://localhost) |
+| **API Documentation (Swagger)** | [http://localhost/api/docs](http://localhost/api/docs) |
+| **Health / Prediction Endpoint** | [http://localhost/api/predict](http://localhost/api/predict) (POST) |
+
+---
+
+## Architecture & Networking
+
+This project uses a **Reverse Proxy (Nginx)** to handle all traffic. This allows the frontend and backend to communicate using relative paths, making the app fully portable across different machines or cloud environments.
+
+| Component | Technology | Port |
+|-----------|------------|------|
+| Frontend | React | 3000 (internal) |
+| Backend | FastAPI (PyTorch) | 8000 (internal) |
+| Proxy | Nginx | 80 (external) |
+
+---
+
+## Project Structure
+
+```
+├── backend/
+│   ├── app.py                      # FastAPI entry point
+│   ├── satellite_classifier.pth    # Pre-trained PyTorch model
+│   ├── Dockerfile                  # Backend container config
+│   └── .dockerignore               # Prevents massive image sizes
+│
+├── satellite-image-ui/
+│   ├── src/                        # React source code
+│   ├── Dockerfile                  # Frontend container config
+│   └── .dockerignore
+│
+├── nginx.conf                      # Nginx routing configuration
+└── docker-compose.yml              # Orchestrator for all services
 ```
 
-The FastAPI app will be available at `http://127.0.0.1:8000` by default.
+---
 
-Notes
-- The model file is `backend/satellite_classifier.pth`. Ensure it remains in the `backend` folder or update the path in `backend/model.py`.
-- If you use a different Python executable, replace `python3` with the appropriate command.
+## Management Commands
 
-Frontend
+| Action | Command |
+|--------|---------|
+| Start Services (Foreground) | `docker-compose up` |
+| Start Services (Background) | `docker-compose up -d` |
+| View Live Logs | `docker-compose logs -f` |
+| Stop and Remove Containers | `docker-compose down` |
+| Force Rebuild (after code changes) | `docker-compose up --build` |
+| Clean up Disk Space | `docker system prune -f` |
 
-1. Install dependencies and start the development server:
+---
 
-```bash
-cd satellite-image-ui
-npm install
-npm start
+## Troubleshooting
+
+### Memory Usage
+
+If the backend image becomes too large, ensure the `.dockerignore` file excludes:
+
+```
+venv/
+data/
+__pycache__/
 ```
 
-The React app will open at `http://localhost:3000` by default and should interact with the backend endpoints.
+### Port 80 Already in Use
 
-Development tips
-- If the frontend cannot reach the backend, confirm both servers are running and that any CORS settings in `backend/app.py` allow requests from the frontend origin.
-- To run linting or tests, use the existing scripts in `satellite-image-ui/package.json` (for frontend) and add test tooling for the backend as needed.
+If port 80 is occupied on your machine, edit the `nginx` service in `docker-compose.yml`:
 
-Troubleshooting
-- "Module not found" or dependency errors: verify the virtual environment is activated and `pip install -r requirements.txt` completed successfully.
-- Permission issues on macOS when creating the venv: try using `python3 -m venv venv` and ensure your Python installation is working.
+```yaml
+ports:
+  - "8080:80"
+```
+
+Then access the app at: [http://localhost:8080](http://localhost:8080)
+
+### CORS Issues
+
+The backend allows all origins using `CORSMiddleware`. Ensure this remains in `app.py` for cross-device or external access.
+
+---
+
+## Tech Stack
+
+- **Frontend:** React
+- **Backend:** FastAPI + PyTorch
+- **Model:** CNN Terrain Classifier
+- **Containerization:** Docker & Docker Compose
+- **Reverse Proxy:** Nginx
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
